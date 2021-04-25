@@ -8,68 +8,115 @@ public class SyncedSlider : MonoBehaviour
     public Slider slider;
     public Slider CookieSlider;
     public AudioSource audios;
-    private bool damagetaken = false;
+    private bool checkedstatus = false;
     private bool Victory = false;
     private bool keypressed = false;
     public Animator player;
     bool TippingCookie=false;
+    public bool CanStretch = true;
+    public bool GameOver = false;
+    public List<KeyCode> logickey=new List<KeyCode>();
+    public Image KeySprite;
+    public List<Sprite> KeySp = new List<Sprite>();
+    int keychoosed;
+    float counter = 0.0f;
+    bool considerUp = true;
     // Start is called before the first frame update
     void Start()
     {
-        
+        keychoosed = Random.Range(0, logickey.Count);
+        KeySprite.sprite = KeySp[keychoosed];
     }
 
     // Update is called once per frame
     void Update()
     {
-        slider.value = Mathf.Lerp(0, 1, ConductorClass.instance.loopPositionInAnalog);
+        if(!GameOver)
+        {
+            slider.value = Mathf.Lerp(0, 3, ConductorClass.instance.loopPositionInAnalog);
+       
         if(TippingCookie)
         {
+
+           
+                Debug.Log(counter);
             CookieSlider.value += 0.1f*Time.deltaTime;
+            if(CookieSlider.value== CookieSlider.maxValue)
+                {
+                    counter += 0.01f * Time.deltaTime;
+                    if(counter > 0.02f)
+                    {
+                        considerUp = false;
+                        FindObjectOfType<MonsterManager>().WrongAnswer();
+                        TippingCookie = false;
+                        counter = 0;
+                        CheckUp();
+                    }
+                    
+                }
         }
         else
         {
+            
             CookieSlider.value =0.0f;
         }
         if(slider.value<0.1f)
         {
-            damagetaken = false;
+            checkedstatus = false;
             Victory = false;
             keypressed = false;
 
         }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        StretchingLogic();
+        if (slider.value>2.99&&!checkedstatus)
+        {
+            checkedstatus = true;
+            FindObjectOfType<MonsterManager>().CheckForVictory();
+        }
+        }
+
+    }
+
+    private void StretchingLogic()
+    {
+        
+        if (Input.GetKeyDown(logickey[keychoosed]))
         {
             player.SetBool("PlayerStretch", true);
             TippingCookie = true;
-            if (slider.value > 0.4f && slider.value < 0.6f && !Victory)
-            {
-                //Victory = true;
-                audios.pitch -= 0.05f;
-                //Debug.Log("point + 1");
-            }
+            CanStretch = false;
+            considerUp = true;
         }
-        if(Input.GetKeyUp(KeyCode.UpArrow))
+        if (Input.GetKeyUp(logickey[keychoosed])&&considerUp)
         {
-            FindObjectOfType<Player>().KeyReleased = true;
-            TippingCookie = false;
-            if (FindObjectOfType<Player>().nextbiscuit< FindObjectOfType<MonsterManager>().numberOfBiscuit)
+            if (CookieSlider.maxValue - CookieSlider.value < 10 * CookieSlider.maxValue / 100)
             {
-                FindObjectOfType<Player>().nextbiscuit += 1;
+                FindObjectOfType<MonsterManager>().CorrectAnswer();
             }
             else
             {
-                FindObjectOfType<Player>().nextbiscuit = 0;
+                FindObjectOfType<MonsterManager>().WrongAnswer();
             }
-                
+            CheckUp();
         }
-        if (slider.value>0.9f&&!damagetaken&&!Victory)
+    }
+
+    private void CheckUp()
+    {
+        keychoosed = Random.Range(0, logickey.Count);
+        KeySprite.sprite = KeySp[keychoosed];
+        
+        if (FindObjectOfType<Player>().nextbiscuit < FindObjectOfType<MonsterManager>().numberOfBiscuit)
         {
-            damagetaken = true;
-            audios.pitch += 0.05f;
-           // Debug.Log("damage+1");
-
-
+            FindObjectOfType<Player>().nextbiscuit += 1;
         }
+        else
+        {
+            FindObjectOfType<Player>().nextbiscuit = 0;
+        }
+        FindObjectOfType<Player>().KeyReleased = true;
+
+
+        TippingCookie = false;
     }
 }

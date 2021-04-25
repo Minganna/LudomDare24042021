@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
 {
     public Animator player;
     public Transform Cookie;
+    public GameObject Cookie1;
+    public GameObject Cookie2;
     public GameObject Cookie3;
     public MonsterManager Monster;
     public bool KeyReleased=false;
@@ -35,6 +37,8 @@ public class Player : MonoBehaviour
         {
             player.SetInteger("state", 1);
             ReachedDestination = true;
+            Cookie.gameObject.SetActive(false);
+            Cookie1.SetActive(true);
         }
     }
     public void ChangeIdleState2()
@@ -44,6 +48,8 @@ public class Player : MonoBehaviour
         {
             player.SetInteger("state", 2);
             ReachedDestination = true;
+            Cookie.gameObject.SetActive(false);
+            Cookie2.SetActive(true);
         }
     }
     public void ChangeIdleState3()
@@ -53,15 +59,17 @@ public class Player : MonoBehaviour
         {
             player.SetInteger("state", 3);
             ReachedDestination = true;
+            Cookie.gameObject.SetActive(false);
+            Cookie3.SetActive(true);
         }
-        Cookie.gameObject.SetActive(false);
-        Cookie3.SetActive(true);
+        
 
 
     }
 
     public void BackToNormal()
     {
+        FindObjectOfType<SyncedSlider>().CanStretch = true;
         KeyReleased = false;
         ReachedDestination = false;
         player.SetBool("PlayerStretch", false);
@@ -77,6 +85,15 @@ public class Player : MonoBehaviour
         {
             Cookie3.SetActive(false);
         }
+        if(Cookie2.activeSelf)
+        {
+            Cookie2.SetActive(false);
+        }
+        if (Cookie1.activeSelf)
+        {
+            Cookie1.SetActive(false);
+        }
+
     }
 
 
