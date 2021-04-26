@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class MonsterManager : MonoBehaviour
 {
@@ -95,7 +96,7 @@ public class MonsterManager : MonoBehaviour
             CookieCoorect[i] = false;
         }
 
-        if (VictoryCount>=2)
+        if (VictoryCount==3)
         {
             if(audios.pitch > 0.8)
             {
@@ -117,6 +118,8 @@ public class MonsterManager : MonoBehaviour
         if(audios.pitch>1.2f)
         {
             FindObjectOfType<SyncedSlider>().GameOver = true;
+            SceneManager.LoadScene(3);
+
         }
         else
         {
